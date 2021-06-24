@@ -53,15 +53,15 @@ def setup():
     # raise e
     print(e)
     driver.quit()
-    driver.get("https://portal.cfm.org.br/busca-medicos/")
     sleep(randint(2,4))
   else:
-    sleep(3)   
-
-  
+    print(driver.execute_script("return navigator.userAgent"))
+    sleep(randint(3,7))   
 
   aceitoCookies = wait(driver,'//*[@id="page"]/div[4]/div[2]/button')
   aceitoCookies.click()
+
+  sleep(3)
 
   return driver;
 
@@ -80,11 +80,29 @@ def buscarPorCRM(driver,crm,uf):
   sleep(randint(1,4))
   
   result = driver.find_element(By.CLASS_NAME,"card-body")
-  medico = retornaStatusCRM(result)
+  medico = retornaSituacaoCRM(result)
   return medico
 
+def buscarVariosPorCRMs(driver,crms,uf):
+  crms = ','.join(crms)
+  inputCRM = wait(driver,'//*[@id="buscaForm"]/div/div[1]/div[3]/div/input')
+  inputCRM.send_keys(crms) 
+  sleep(randint(2,4))
+  dropdown = driver.find_element(By.ID, "uf")
+  # dropdown.find_element(By.XPATH, "//option[. = 'MG']").click()
+  wait(dropdown,"//option[. = '{}']".format(uf)).click()
+  sleep(randint(3,5))
+  
+  buscar = wait(driver,'//*[@id="buscaForm"]/div/div[4]/div[2]/button')
+  buscar.click()
+  
+  sleep(randint(4,7))
+  
+  results = driver.find_elements(By.CLASS_NAME,"card-body")
+  return results
 
-def retornaStatusCRM(result):
+
+def retornaSituacaoCRM(result):
   nome = result.find_element(By.TAG_NAME,'h4').text
   crm = result.find_element(By.XPATH,'./div[1]/div[1]').text.split(': ')[1].split('-')[0]
   situacao = result.find_element(By.XPATH,'./div[2]/div[2]').text.split(': ')[1]
@@ -114,44 +132,56 @@ def retornaTotalRegistro():
 
 
 
+groupedCRM = {}
+
+with open('MEDICOS_CRM.csv',newline='') as csvfile:
+  reader = csv.DictReader(csvfile, delimiter=';')
+  for row in reader:
+    crm = row['NUM_CONSELHO']
+    uf = row['UF_CONSELHO']
+    if uf not in groupedCRM.keys() :
+      groupedCRM[uf] = [crm]
+    else:
+      groupedCRM[uf].append(crm)
 
 
-
-
-# medicosStatus = []
 
 with open('medicosStatus.csv','w',newline='') as csvfilewriter:
   fields = ['nome','crm','uf','situacao']
   writer = csv.DictWriter(csvfilewriter,fieldnames = fields)
   writer.writeheader()
 
-  # for m in medicosStatus:
-  #   writer.writerow(m)
+  for uf,crms in groupedCRM.items():
+    while len(crms) > 0:
+      lista10 = [crms.pop() for i in range(10) if len(crms) > 0]
+
+      resultsOK = True
+      while resultsOK:
+        driver = setup()
+        print('{} - {}'.format(uf,lista10))
+        try:
+          results = buscarVariosPorCRMs(driver,lista10,uf)
+        except Exception as e:
+          # raise e
+          driver.quit()
+          print(e)
+          resultsOK = True
+          # medico = dict(nome=e)
+          # writer.writerow(medico)
+          # medicosStatus.append(medico)
+        else:
+          if len(results) > 0:
+            for r in results:
+              medico = retornaSituacaoCRM(r)
+              medico['uf'] = uf
+              print(medico)
+              writer.writerow(medico)
+            # medicosStatus.append(medico)
+            driver.quit()
+            resultsOK = False 
+          else:
+            driver.quit()
+            resultsOK = True
 
 
-  with open('MEDICOS_CRM.csv',newline='') as csvfile:
-    reader = csv.DictReader(csvfile, delimiter=';')
-    for row in reader:
-      crm = row['NUM_CONSELHO']
-      uf = row['UF_CONSELHO']
-
-      print(row)
-
-      driver = setup()
-
-      try:
-        medico = buscarPorCRM(driver,crm,uf)
-      except Exception as e:
-        # raise e
-        driver.quit()
-        print(e)
-        # medico = dict(nome=e)
-        # writer.writerow(medico)
-        # medicosStatus.append(medico)
-      else:
-        medico['nome'] = row['NOME']
-        medico['uf'] = row['UF_CONSELHO']
-        writer.writerow(medico)
-        # medicosStatus.append(medico)
-        driver.quit()
          
