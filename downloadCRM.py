@@ -3,6 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from user_agent import generate_user_agent
 from math import ceil
 from time import sleep
@@ -42,8 +43,13 @@ def setup():
   options.add_argument('--no-sandbox')
   options.add_argument("--disable-notifications")
   options.add_argument('--disable-dev-shm-usage')
+
+  driver = webdriver.Remote(
+   command_executor='http://127.0.0.1:4444/wd/hub',
+   desired_capabilities=DesiredCapabilities.CHROME,
+   options = options)
   
-  driver = webdriver.Chrome(options = options)
+  # driver = webdriver.Chrome(options = options)
   driver.delete_all_cookies()
   driver.set_window_size(1061, 701)
 
