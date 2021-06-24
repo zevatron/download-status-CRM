@@ -30,7 +30,7 @@ from random import randint
 #       print(i.text)
 
 def setup():
-  userAgent = generate_user_agent()
+  userAgent = generate_user_agent(device_type="desktop")
 
   options = Options()
   options.add_argument('--headless')
