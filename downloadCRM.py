@@ -3,38 +3,28 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
-from user_agent import generate_user_agent
+# from user_agent import generate_user_agent
 from math import ceil
 from time import sleep
 import csv
 from random import randint
 
-# class TestTeste():
-#   def setup_method(self, method):
-#     self.driver = webdriver.Chrome()
-#     self.vars = {}
-  
-#   def teardown_method(self, method):
-#     self.driver.quit()
-  
-#   def test_teste(self):
-#     self.driver.get("https://portal.cfm.org.br/busca-medicos/")
-#     self.driver.set_window_size(1061, 701)
-#     self.driver.find_element(By.ID, "uf").click()
-#     dropdown = self.driver.find_element(By.ID, "uf")
-#     dropdown.find_element(By.XPATH, "//option[. = 'MG']").click()
-#     self.driver.find_element(By.ID, "uf").click()
-#     self.driver.find_element(By.XPATH, "//*[@id=\"buscaForm\"]/div/div[4]/div[2]/button").click()
-#     results = self.driver.find_elements_by_class_name("busca-resultado")
-#     for i in results:
-#       print(i.text)
 
 def setup():
-  userAgent = generate_user_agent(device_type="desktop")
+  userAgents = ['Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36',
+        'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.107 Safari/537.36',
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64; ServiceUI 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18362',
+        'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:77.0) Gecko/20100101 Firefox/77.0',
+        'Mozilla/5.0 (X11; Linux ppc64le; rv:75.0) Gecko/20100101 Firefox/75.0',
+        'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:44.0) Gecko/20100101 Firefox/89.0.1',
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0.1 Safari/605.1.15',
+        'Mozilla/5.0 (X11; Linux riscv64) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15',
+        ]
+  # userAgent = generate_user_agent(device_type="desktop")
 
   options = Options()
   options.add_argument('--headless')
-  options.add_argument(f'user-agent={userAgent}')
+  options.add_argument(f'user-agent={userAgents[randint(0,len(userAgents)-1)]}')
   options.add_argument('--disable-gpu')
   options.add_argument('--lang=pt_BR')
   # prefs = {"download.default_directory":path}   #path is a string containing the directory you want the downloaded songs stored
