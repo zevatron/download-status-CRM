@@ -7,6 +7,7 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 # from user_agent import generate_user_agent
 from math import ceil
 from time import sleep
+import datetime
 import csv
 from random import randint
 
@@ -105,7 +106,8 @@ def retornaSituacaoCRM(result):
     nome = result.find_element(By.TAG_NAME, 'h4').text
     crm = result.find_element(By.XPATH, './div[1]/div[1]').text.split(': ')[1].split('-')[0]
     situacao = result.find_element(By.XPATH, './div[2]/div[2]').text.split(': ')[1]
-    medico = dict(nome=nome, crm=crm, situacao=situacao)
+    data_hora_atualizacao = datetime.datetime.now().strftime("%d/%m/%Y %X")
+    medico = dict(nome=nome, crm=crm, situacao=situacao,data_hora_atualizacao=data_hora_atualizacao)
     return medico
 
 
@@ -129,7 +131,7 @@ def retornaTotalRegistro():
     total = int(totalDeResultados.text.split(' ')[0])
     print("Total de registros encontrados: " + str(total) + ' em ' + str(ceil(total / 10)) + ' páginas')
 
-
+hoje = datetime.datetime.now().strftime("%Y%m%d")
 groupedCRM = {}
 
 with open('MEDICOS_CRM.csv', newline='') as csvfile:
@@ -142,8 +144,8 @@ with open('MEDICOS_CRM.csv', newline='') as csvfile:
         else:
             groupedCRM[uf].append(crm)
 
-with open('medicosStatus.csv', 'w', newline='') as csvfilewriter:
-    fields = ['nome', 'crm', 'uf', 'situacao']
+with open('medicosStatus_{}.csv'.format(hoje), 'w', newline='') as csvfilewriter:
+    fields = ['nome', 'crm', 'uf', 'situacao','data_hora_atualizacao']
     writer = csv.DictWriter(csvfilewriter, fieldnames=fields)
     writer.writeheader()
 
