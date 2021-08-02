@@ -12,7 +12,8 @@ from random import randint
 
 
 def setup():
-  userAgents = ['Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36',
+    userAgents = [
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36',
         'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.107 Safari/537.36',
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64; ServiceUI 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18362',
         'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:77.0) Gecko/20100101 Firefox/77.0',
@@ -21,90 +22,91 @@ def setup():
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0.1 Safari/605.1.15',
         'Mozilla/5.0 (X11; Linux riscv64) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Safari/605.1.15',
         ]
-  # userAgent = generate_user_agent(device_type="desktop")
+    # userAgent = generate_user_agent(device_type="desktop")
 
-  options = Options()
-  options.add_argument('--headless')
-  options.add_argument(f'user-agent={userAgents[randint(0,len(userAgents)-1)]}')
-  options.add_argument('--disable-gpu')
-  options.add_argument('--lang=pt_BR')
-  # prefs = {"download.default_directory":path}   #path is a string containing the directory you want the downloaded songs stored
-  # options.add_experimental_option("prefs",prefs)
-  options.add_argument('--no-sandbox')
-  options.add_argument("--disable-notifications")
-  options.add_argument('--disable-dev-shm-usage')
+    options = Options()
+    options.add_argument('--headless')
+    options.add_argument(f'user-agent={userAgents[randint(0, len(userAgents) - 1)]}')
+    options.add_argument('--disable-gpu')
+    options.add_argument('--lang=pt_BR')
+    # prefs = {"download.default_directory":path}   #path is a string containing the directory you want the downloaded songs stored
+    # options.add_experimental_option("prefs",prefs)
+    options.add_argument('--no-sandbox')
+    options.add_argument("--disable-notifications")
+    options.add_argument('--disable-dev-shm-usage')
 
-  driver = webdriver.Remote(
-   command_executor='http://127.0.0.1:4444/wd/hub',
-   desired_capabilities=DesiredCapabilities.CHROME,
-   options = options)
-  
-  # driver = webdriver.Chrome(options = options)
-  driver.delete_all_cookies()
-  driver.set_window_size(1061, 701)
+    driver = webdriver.Remote(
+        command_executor='http://127.0.0.1:4444/wd/hub',
+        desired_capabilities=DesiredCapabilities.CHROME,
+        options=options)
 
-  try:
-    driver.get("https://portal.cfm.org.br/busca-medicos/")
-  except Exception as e:
-    # raise e
-    print(e)
-    driver.quit()
-    sleep(randint(2,4))
-  else:
-    print(driver.execute_script("return navigator.userAgent"))
-    sleep(randint(3,7))   
+    # driver = webdriver.Chrome(options = options)
+    driver.delete_all_cookies()
+    driver.set_window_size(1061, 701)
 
-  aceitoCookies = wait(driver,'//*[@id="page"]/div[4]/div[2]/button')
-  aceitoCookies.click()
+    try:
+        driver.get("https://portal.cfm.org.br/busca-medicos/")
+    except Exception as e:
+        # raise e
+        print(e)
+        driver.quit()
+        sleep(randint(2, 4))
+    else:
+        print(driver.execute_script("return navigator.userAgent"))
+        sleep(randint(3, 7))
 
-  sleep(3)
+    aceitoCookies = wait(driver, '//*[@id="page"]/div[4]/div[2]/button')
+    aceitoCookies.click()
 
-  return driver;
+    sleep(3)
 
-def buscarPorCRM(driver,crm,uf):
-  inputCRM = wait(driver,'//*[@id="buscaForm"]/div/div[1]/div[3]/div/input')
-  inputCRM.send_keys(crm) 
-  sleep(randint(1,3))
-  dropdown = driver.find_element(By.ID, "uf")
-  # dropdown.find_element(By.XPATH, "//option[. = 'MG']").click()
-  wait(dropdown,"//option[. = '{}']".format(uf)).click()
-  sleep(randint(1,4))
-  
-  buscar = wait(driver,'//*[@id="buscaForm"]/div/div[4]/div[2]/button')
-  buscar.click()
-  
-  sleep(randint(1,4))
-  
-  result = driver.find_element(By.CLASS_NAME,"card-body")
-  medico = retornaSituacaoCRM(result)
-  return medico
+    return driver;
 
-def buscarVariosPorCRMs(driver,crms,uf):
-  crms = ','.join(crms)
-  inputCRM = wait(driver,'//*[@id="buscaForm"]/div/div[1]/div[3]/div/input')
-  inputCRM.send_keys(crms) 
-  sleep(randint(2,4))
-  dropdown = driver.find_element(By.ID, "uf")
-  # dropdown.find_element(By.XPATH, "//option[. = 'MG']").click()
-  wait(dropdown,"//option[. = '{}']".format(uf)).click()
-  sleep(randint(3,5))
-  
-  buscar = wait(driver,'//*[@id="buscaForm"]/div/div[4]/div[2]/button')
-  buscar.click()
-  
-  sleep(randint(4,7))
-  
-  results = driver.find_elements(By.CLASS_NAME,"card-body")
-  return results
+
+def buscarPorCRM(driver, crm, uf):
+    inputCRM = wait(driver, '//*[@id="buscaForm"]/div/div[1]/div[3]/div/input')
+    inputCRM.send_keys(crm)
+    sleep(randint(1, 3))
+    dropdown = driver.find_element(By.ID, "uf")
+    # dropdown.find_element(By.XPATH, "//option[. = 'MG']").click()
+    wait(dropdown, "//option[. = '{}']".format(uf)).click()
+    sleep(randint(1, 4))
+
+    buscar = wait(driver, '//*[@id="buscaForm"]/div/div[4]/div[2]/button')
+    buscar.click()
+
+    sleep(randint(1, 4))
+
+    result = driver.find_element(By.CLASS_NAME, "card-body")
+    medico = retornaSituacaoCRM(result)
+    return medico
+
+
+def buscarVariosPorCRMs(driver, crms, uf):
+    crms = ','.join(crms)
+    inputCRM = wait(driver, '//*[@id="buscaForm"]/div/div[1]/div[3]/div/input')
+    inputCRM.send_keys(crms)
+    sleep(randint(2, 4))
+    dropdown = driver.find_element(By.ID, "uf")
+    # dropdown.find_element(By.XPATH, "//option[. = 'MG']").click()
+    wait(dropdown, "//option[. = '{}']".format(uf)).click()
+    sleep(randint(3, 5))
+
+    buscar = wait(driver, '//*[@id="buscaForm"]/div/div[4]/div[2]/button')
+    buscar.click()
+
+    sleep(randint(4, 7))
+
+    results = driver.find_elements(By.CLASS_NAME, "card-body")
+    return results
 
 
 def retornaSituacaoCRM(result):
-  nome = result.find_element(By.TAG_NAME,'h4').text
-  crm = result.find_element(By.XPATH,'./div[1]/div[1]').text.split(': ')[1].split('-')[0]
-  situacao = result.find_element(By.XPATH,'./div[2]/div[2]').text.split(': ')[1]
-  medico = dict(nome = nome, crm = crm, situacao = situacao)
-  return medico    
-
+    nome = result.find_element(By.TAG_NAME, 'h4').text
+    crm = result.find_element(By.XPATH, './div[1]/div[1]').text.split(': ')[1].split('-')[0]
+    situacao = result.find_element(By.XPATH, './div[2]/div[2]').text.split(': ')[1]
+    medico = dict(nome=nome, crm=crm, situacao=situacao)
+    return medico
 
 
 def wait(driver, x):
@@ -112,6 +114,7 @@ def wait(driver, x):
         EC.presence_of_element_located((By.XPATH, x))
     )
     return element
+
 
 # def retornaVariosResultados(results):
 #   for i in results:
@@ -122,62 +125,56 @@ def wait(driver, x):
 
 
 def retornaTotalRegistro():
-  totalDeResultados = wait(driver,'//*[@id="resultados"]/div')
-  total = int(totalDeResultados.text.split(' ')[0])
-  print("Total de registros encontrados: " + str(total) + ' em ' + str(ceil(total/10)) + ' páginas')
-
+    totalDeResultados = wait(driver, '//*[@id="resultados"]/div')
+    total = int(totalDeResultados.text.split(' ')[0])
+    print("Total de registros encontrados: " + str(total) + ' em ' + str(ceil(total / 10)) + ' páginas')
 
 
 groupedCRM = {}
 
-with open('MEDICOS_CRM.csv',newline='') as csvfile:
-  reader = csv.DictReader(csvfile, delimiter=';')
-  for row in reader:
-    crm = row['NUM_CONSELHO']
-    uf = row['UF_CONSELHO']
-    if uf not in groupedCRM.keys() :
-      groupedCRM[uf] = [crm]
-    else:
-      groupedCRM[uf].append(crm)
-
-
-
-with open('medicosStatus.csv','w',newline='') as csvfilewriter:
-  fields = ['nome','crm','uf','situacao']
-  writer = csv.DictWriter(csvfilewriter,fieldnames = fields)
-  writer.writeheader()
-
-  for uf,crms in groupedCRM.items():
-    while len(crms) > 0:
-      lista10 = [crms.pop() for i in range(10) if len(crms) > 0]
-
-      resultsOK = True
-      while resultsOK:
-        driver = setup()
-        print('{} - {}'.format(uf,lista10))
-        try:
-          results = buscarVariosPorCRMs(driver,lista10,uf)
-        except Exception as e:
-          # raise e
-          driver.quit()
-          print(e)
-          resultsOK = True
-          # medico = dict(nome=e)
-          # writer.writerow(medico)
-          # medicosStatus.append(medico)
+with open('MEDICOS_CRM.csv', newline='') as csvfile:
+    reader = csv.DictReader(csvfile, delimiter=';')
+    for row in reader:
+        crm = row['NUM_CONSELHO']
+        uf = row['UF_CONSELHO']
+        if uf not in groupedCRM.keys():
+            groupedCRM[uf] = [crm]
         else:
-          if len(results) > 0:
-            for r in results:
-              medico = retornaSituacaoCRM(r)
-              medico['uf'] = uf
-              print(medico)
-              writer.writerow(medico)
-            # medicosStatus.append(medico)
-            driver.quit()
-            resultsOK = False 
-          else:
-            driver.quit()
+            groupedCRM[uf].append(crm)
+
+with open('medicosStatus.csv', 'w', newline='') as csvfilewriter:
+    fields = ['nome', 'crm', 'uf', 'situacao']
+    writer = csv.DictWriter(csvfilewriter, fieldnames=fields)
+    writer.writeheader()
+
+    for uf, crms in groupedCRM.items():
+        while len(crms) > 0:
+            lista10 = [crms.pop() for i in range(10) if len(crms) > 0]
+
             resultsOK = True
-
-
-         
+            while resultsOK:
+                driver = setup()
+                print('{} - {}'.format(uf, lista10))
+                try:
+                    results = buscarVariosPorCRMs(driver, lista10, uf)
+                except Exception as e:
+                    # raise e
+                    driver.quit()
+                    print(e)
+                    resultsOK = True
+                    # medico = dict(nome=e)
+                    # writer.writerow(medico)
+                    # medicosStatus.append(medico)
+                else:
+                    if len(results) > 0:
+                        for r in results:
+                            medico = retornaSituacaoCRM(r)
+                            medico['uf'] = uf
+                            print(medico)
+                            writer.writerow(medico)
+                        # medicosStatus.append(medico)
+                        driver.quit()
+                        resultsOK = False
+                    else:
+                        driver.quit()
+                        resultsOK = True
