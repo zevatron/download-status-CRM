@@ -87,7 +87,7 @@ def buscarVariosPorCRMs(driver, crms, uf):
     crms = ','.join(crms)
     inputCRM = wait(driver, '//*[@id="buscaForm"]/div/div[1]/div[3]/div/input')
     inputCRM.send_keys(crms)
-    sleep(randint(2, 4))
+    sleep(randint(3, 7))
     dropdown = driver.find_element(By.ID, "uf")
     # dropdown.find_element(By.XPATH, "//option[. = 'MG']").click()
     wait(dropdown, "//option[. = '{}']".format(uf)).click()
@@ -151,14 +151,14 @@ with open('medicosStatus_{}.csv'.format(hoje), 'w', newline='') as csvfilewriter
 
     for uf, crms in groupedCRM.items():
         while len(crms) > 0:
-            lista10 = [crms.pop() for i in range(10) if len(crms) > 0]
+            listaAleatoria = [crms.pop() for i in range(randint(6,10)) if len(crms) > 0]
 
             resultsOK = True
             while resultsOK:
                 driver = setup()
-                print('{} - {}'.format(uf, lista10))
+                print('{} - {}'.format(uf, listaAleatoria))
                 try:
-                    results = buscarVariosPorCRMs(driver, lista10, uf)
+                    results = buscarVariosPorCRMs(driver, listaAleatoria, uf)
                 except Exception as e:
                     # raise e
                     driver.quit()
