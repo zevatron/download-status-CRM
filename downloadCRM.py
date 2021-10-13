@@ -106,8 +106,9 @@ def retornaSituacaoCRM(result):
     nome = result.find_element(By.TAG_NAME, 'h4').text
     crm = result.find_element(By.XPATH, './div[1]/div[1]').text.split(': ')[1].split('-')[0]
     situacao = result.find_element(By.XPATH, './div[2]/div[2]').text.split(': ')[1]
+    especialidade = result.find_element(By.XPATH, './div[5]/div').text.replace('\n',' / ')
     data_hora_atualizacao = datetime.datetime.now().strftime("%d/%m/%Y %X")
-    medico = dict(nome=nome, crm=crm, situacao=situacao,data_hora_atualizacao=data_hora_atualizacao)
+    medico = dict(nome=nome, crm=crm, situacao=situacao,especialidade=especialidade,data_hora_atualizacao=data_hora_atualizacao)
     return medico
 
 
@@ -145,7 +146,7 @@ with open('MEDICOS_CRM.csv', newline='') as csvfile:
             groupedCRM[uf].append(crm)
 
 with open('medicosStatus_{}.csv'.format(hoje), 'w', newline='') as csvfilewriter:
-    fields = ['nome', 'crm', 'uf', 'situacao','data_hora_atualizacao']
+    fields = ['nome', 'crm', 'uf', 'situacao','especialidade','data_hora_atualizacao']
     writer = csv.DictWriter(csvfilewriter, fieldnames=fields)
     writer.writeheader()
 

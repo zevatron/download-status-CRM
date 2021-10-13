@@ -7,3 +7,6 @@ __pycache__/
 *.csv
 *.exe
 *.ppk
+Apps/
+*.bat
+*.filepart
